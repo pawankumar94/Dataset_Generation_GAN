@@ -1,0 +1,23 @@
+--  PRESCRIPTIONS
+create table  Presc_final as
+Select PRESCRIPTIONS.SUBJECT_ID, PRESCRIPTIONS.ICUSTAY_ID , PRESCRIPTIONS.drug, PRESCRIPTIONS.DRUG_TYPE,PRESCRIPTIONS.startdate as Prescripton_date,
+PRESCRIPTIONS.DOSE_VAL_RX,PRESCRIPTIONS.DOSE_UNIT_RX
+FROM PRESCRIPTIONS 
+INNER JOIN ICUSTAYS
+USING( ICUSTAY_ID ) 
+ORDER By Prescripton_date
+
+
+
+-- Diagnosis Table 
+SELECT  subject_id,admittime,dischtime,diagnosis as Initial_Diagnosis, Description_Diagnosis, hospital_expire_flag FROM 
+(select subject_id,hadm_id,admittime,dischtime,admission_type,hospital_expire_flag,diagnosis ,x.icd9_code ,z.expire_flag
+from ADMISSIONS INNER JOIN 
+DIAGNOSES_ICD as x USING ( subject_id,hadm_id )
+INNER JOIN PATIENTS as z  USING(subject_id) ) x  JOIN(SELECT long_title as Description_Diagnosis,icd9_code from D_ICD_DIAGNOSES )y 
+USING (icd9_code) 
+
+
+-- Vital Signs 
+Create TABLE
+SELECT subject_id ,storetime, value , valueuom , x.label from CHARTEVENTS INNER JOIN D_ITEMS x USING (itemid) WHERE x.label IN ('Heart Rate' ,'Non Invasive Blood Pressure systolic','Non Invasive Blood Pressure diastolic', 'Respiratory Rate','Temperature F', 'Hemoglobin','Platelet Count','BP Right Arm [Systolic]','SpO2') ORDER By storetime
